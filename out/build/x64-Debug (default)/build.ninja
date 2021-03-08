@@ -72,7 +72,7 @@ build rebuild_cache: phony CMakeFiles\rebuild_cache.util
 build cmake_object_order_depends_target_Toby: phony || Toby\CMakeFiles\Toby.dir
 
 build Toby\CMakeFiles\Toby.dir\main.cpp.obj: CXX_COMPILER__Toby_Debug ..\..\..\Toby\main.cpp || cmake_object_order_depends_target_Toby
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++latest
   OBJECT_DIR = Toby\CMakeFiles\Toby.dir
   OBJECT_FILE_DIR = Toby\CMakeFiles\Toby.dir
   TARGET_COMPILE_PDB = Toby\CMakeFiles\Toby.dir\

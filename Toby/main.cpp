@@ -1,11 +1,12 @@
 ﻿// Toby.cpp : Defines the entry point for the application.
 //
 
-#include "Toby.h"
+#include "Toby.hh"
 
-
+#include <iostream>
 int main()
 {
-	std::cout << "Hello CMake." << std::endl;
+	libCore::Toby::Toby toby("test.toby");
+	std::cout << toby << std::endl;
 	return 0;
 }
