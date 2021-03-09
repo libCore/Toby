@@ -1,2 +1,5 @@
 #version 0
-a=kek
+[Main]
+a=test1
+[Second]
+a=test23

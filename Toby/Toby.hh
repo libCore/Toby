@@ -9,8 +9,8 @@
 #include <utility>
 #include <vector>
 #include <sstream>
-
-#include <iostream>
+#include <map>
+#include <any>
 
 namespace libCore {
 
@@ -36,20 +36,52 @@ namespace libCore {
 
 				while (std::getline(file, data))
 				{
-					auto pair = get_preproc(data);
-					if (pair.first != pre_proc::version || pair.second != LIBCORE_TOBY_VERSION)
-						throw std::exception("Version not supplied.");
-					break;
+					if (data[0] == '#')
+					{
+						auto pair = get_preproc(data);
+						if (pair.first != pre_proc::version || pair.second != LIBCORE_TOBY_VERSION)
+							throw std::exception("Version not supplied.");
+					}
+					else
+					{
+						if (parse(data) == -1)
+							throw std::exception("Can't parse.");
+					}
 				}
 			}
 			int version() { return _ver; }
+			std::map<std::string, std::map<std::string, std::any>> Get()
+			{
+				return _data;
+			}
 		private:
+			bool is_section(std::string sec)
+			{
+				auto size_sec = sec.size();
+				return (sec[0] == '[' && sec[size_sec-1] == ']');
+			}
+
+			std::string clean_section(std::string sec)
+			{
+				sec.erase(sec.begin());
+				sec.erase(sec.end() - 1);
+				return sec;
+			}
+
+			int parse(std::string line)
+			{
+				// main
+				// We check if the line is a section. If it is, we are going store the section.
+				if (is_section(line)) { _scope = clean_section(line); return 1; }
+
+				auto parsed_data = split(line, '=');
+				auto pair = std::make_pair(parsed_data[0], (std::any)parsed_data[1]);
+				_data[_scope].insert(pair);
+
+			}
+
 			std::pair<pre_proc, int> get_preproc(std::string line)
 			{
-
-				if (line[0] != '#')
-					throw std::exception("Pre-processor not declared.");
-
 				auto value_splitted = split(line, ' ');
 				std::string token = value_splitted[0].c_str();
 				token.erase(token.begin());
@@ -65,11 +97,7 @@ namespace libCore {
 					{
 						throw e;
 					}
-					
-
 				}
-
-				//return std::make_pair()
 			}
 
 			std::vector<std::string> split(const std::string& s, char delimiter)
@@ -84,12 +112,14 @@ namespace libCore {
 				return tokens;
 			}
 
-			
+	
 
 		private:
 			std::string _path;
 			int _ver;
+			std::string _scope;
 			std::vector<std::pair<pre_proc, int>> _preproc_list;
+			std::map<std::string, std::map<std::string, std::any>> _data;
 		};
 
 	}

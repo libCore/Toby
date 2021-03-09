@@ -7,6 +7,7 @@
 int main()
 {
 	libCore::Toby::Toby toby("test.toby");
-	std::cout << toby << std::endl;
+	std::cout << std::any_cast<std::string>(toby.Get()["Main"]["a"]) << std::endl;
+	std::cout << std::any_cast<std::string>(toby.Get()["Second"]["a"]) << std::endl;
 	return 0;
 }
