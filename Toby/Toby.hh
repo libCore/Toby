@@ -18,7 +18,8 @@ namespace libCore {
 
 		enum class pre_proc
 		{
-			version
+			version,
+			define
 		};
 
 		class Toby
@@ -38,9 +39,11 @@ namespace libCore {
 				{
 					if (data[0] == '#')
 					{
-						auto pair = get_preproc(data);
-						if (pair.first != pre_proc::version || pair.second != LIBCORE_TOBY_VERSION)
-							throw std::exception("Version not supplied.");
+						if (!set_preproc(data))							
+							throw std::exception("Can't get the preprocs..");
+
+						if (std::any_cast<int>(_preproc_list[pre_proc::version]["ver"]) != LIBCORE_TOBY_VERSION)
+							throw std::exception("Version not implemented or supplied.");
 					}
 					else
 					{
@@ -75,12 +78,12 @@ namespace libCore {
 				if (is_section(line)) { _scope = clean_section(line); return 1; }
 
 				auto parsed_data = split(line, '=');
-				auto pair = std::make_pair(parsed_data[0], (std::any)parsed_data[1]);
+				auto pair = std::make_pair(parsed_data[0], std::make_any<std::string>(parsed_data[1]));
 				_data[_scope].insert(pair);
 
 			}
 
-			std::pair<pre_proc, int> get_preproc(std::string line)
+			bool set_preproc(std::string line)
 			{
 				auto value_splitted = split(line, ' ');
 				std::string token = value_splitted[0].c_str();
@@ -90,12 +93,29 @@ namespace libCore {
 					try
 					{
 						_ver = std::stoi(value_splitted[1]);
-						_preproc_list.push_back(std::make_pair<pre_proc, int>(pre_proc::version, std::stoi(value_splitted[1])));
-						return std::make_pair<pre_proc, int>(pre_proc::version, std::stoi(value_splitted[1]));
+						_preproc_list[pre_proc::version].insert(std::make_pair<std::string, std::any>("ver", std::make_any<std::string>(value_splitted[1])));
+
+						return true;
 					}
 					catch (const std::exception& e)
 					{
 						throw e;
+						return false;
+
+					}
+				}
+				else if (token == "define")
+				{
+					try
+					{
+						_preproc_list[pre_proc::define].insert(std::make_pair<std::string, std::any>(value_splitted[1].c_str(), std::make_any<std::string>(value_splitted[2])));
+						return true;
+
+					}
+					catch (const std::exception& e)
+					{
+						throw e;
+						return false;
 					}
 				}
 			}
@@ -118,7 +138,7 @@ namespace libCore {
 			std::string _path;
 			int _ver;
 			std::string _scope;
-			std::vector<std::pair<pre_proc, int>> _preproc_list;
+			std::map<pre_proc, std::map<std::string, std::any>> _preproc_list;
 			std::map<std::string, std::map<std::string, std::any>> _data;
 		};
 
