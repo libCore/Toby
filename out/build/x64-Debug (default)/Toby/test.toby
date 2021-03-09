@@ -1,5 +1,0 @@
-#version 1
-[Main]
-a=test1
-[Second]
-a=test23
