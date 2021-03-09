@@ -1,6 +1,6 @@
 #pragma once
 
-#define LIBCORE_TOBY_VERSION 0
+#define LIBCORE_TOBY_VERSION 1
 
 #include <string>
 #include <istream>

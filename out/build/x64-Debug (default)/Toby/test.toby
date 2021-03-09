@@ -1,4 +1,4 @@
-#version 0
+#version 1
 [Main]
 a=test1
 [Second]
