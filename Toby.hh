@@ -75,6 +75,10 @@ namespace libCore {
 			{
 				return _data;
 			}
+			bool Write()
+			{
+
+			}
 		private:
 			bool is_section(std::string sec)
 			{
