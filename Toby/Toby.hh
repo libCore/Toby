@@ -80,7 +80,7 @@ namespace libCore {
 				auto parsed_data = split(line, '=');
 				auto pair = std::make_pair(parsed_data[0], std::make_any<std::string>(parsed_data[1]));
 				_data[_scope].insert(pair);
-
+				return 0;
 			}
 
 			bool set_preproc(std::string line)
@@ -117,6 +117,10 @@ namespace libCore {
 						throw e;
 						return false;
 					}
+				}
+				else
+				{
+					throw std::exception("Unknow preproc");
 				}
 			}
 
