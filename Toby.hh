@@ -1,16 +1,34 @@
 #pragma once
 
-#define LIBCORE_TOBY_VERSION 1
+/*
+	libreCore or libCore - Toby config.
 
+	Author: Alex. G. B. aka Zankuro
+
+	License: BSD 2-Clause License
+		Permisions: Commercial use, Distribution, Modification, Private use
+		Conditions: License and copyright notice
+		Limitations: Liability, Warranty
+*/
+
+#ifndef LIBCORE_TOBY
+#define LIBCORE_TOBY
+
+
+// YOU MUST **NOT** CHANGE THIS
+#define LIBCORE_TOBY_VERSION 0
+
+// If you don't want includes, just define it.
+#ifndef LIBCORE_NOINCLUDES
 #include <string>
 #include <istream>
 #include <fstream>
-#include <any>
 #include <utility>
 #include <vector>
 #include <sstream>
 #include <map>
 #include <any>
+#endif // !LIBCORE_NOINCLUDES
 
 namespace libCore {
 
@@ -53,7 +71,7 @@ namespace libCore {
 				}
 			}
 			int version() { return _ver; }
-			std::map<std::string, std::map<std::string, std::any>> Get()
+			std::map<std::string, std::map<std::string, std::any>> Read()
 			{
 				return _data;
 			}
@@ -150,3 +168,4 @@ namespace libCore {
 
 
 }
+#endif // !LIBCORE_TOBY
