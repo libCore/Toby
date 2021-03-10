@@ -42,7 +42,7 @@ namespace libCore {
 						if (!set_preproc(data))							
 							throw std::exception("Can't get the preprocs..");
 
-						if (std::any_cast<int>(_preproc_list[pre_proc::version]["ver"]) >= LIBCORE_TOBY_VERSION)
+						if (std::any_cast<int>(_preproc_list[pre_proc::version]["ver"]) != LIBCORE_TOBY_VERSION)
 							throw std::exception("Version not implemented or supplied.");
 					}
 					else
@@ -52,14 +52,11 @@ namespace libCore {
 					}
 				}
 			}
-
 			int version() { return _ver; }
-			
 			std::map<std::string, std::map<std::string, std::any>> Get()
 			{
 				return _data;
 			}
-
 		private:
 			bool is_section(std::string sec)
 			{
@@ -83,7 +80,7 @@ namespace libCore {
 				auto parsed_data = split(line, '=');
 				auto pair = std::make_pair(parsed_data[0], std::make_any<std::string>(parsed_data[1]));
 				_data[_scope].insert(pair);
-				return 0;
+
 			}
 
 			bool set_preproc(std::string line)
@@ -121,10 +118,6 @@ namespace libCore {
 						return false;
 					}
 				}
-				else
-				{
-					throw std::exception("preproc not implemented.");
-				}
 			}
 
 			std::vector<std::string> split(const std::string& s, char delimiter)
@@ -139,7 +132,7 @@ namespace libCore {
 				return tokens;
 			}
 
-		
+	
 
 		private:
 			std::string _path;
