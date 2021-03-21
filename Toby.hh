@@ -18,6 +18,7 @@
 // YOU MUST **NOT** CHANGE THIS
 #define LIBCORE_TOBY_VERSION 0
 
+
 // If you don't want includes, just define it.
 #ifndef LIBCORE_NOINCLUDES
 #include <string>
@@ -40,6 +41,8 @@ namespace libCore {
 			version,
 			define
 		};
+		
+		typedef std::map<std::string, std::map<std::string, std::any>> data_t;
 
 		class Toby
 		{
@@ -81,11 +84,108 @@ namespace libCore {
 				return _data;
 			}
 			*/
+			// DumbWrite
+			bool Write(std::string path, data_t data)
+			{
+
+				std::ofstream file(path, std::ios::out);
+
+				if (!file.is_open())
+				{
+					return false;
+					throw std::exception("Cannot open the file.");
+				}
+
+				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
+
+				std::lock_guard<std::mutex> lock(_data_mutex);
+
+				for (const auto& Fpair : data)
+				{
+					file << make_section(Fpair.first) << std::endl;
+					for (const auto& Spair : Fpair.second)
+					{
+						file << make_field(Spair.first, Spair.second) << std::endl;
+					}
+				}
+
+				file.close();
+			}
+			bool Write(std::string path)
+			{
+
+				std::ofstream file(path, std::ios::out);
+
+				if (!file.is_open())
+				{
+					return false;
+					throw std::exception("Cannot open the file.");
+				}
+
+				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
+
+				std::lock_guard<std::mutex> lock(_data_mutex);
+
+				for (const auto& Fpair : _data)
+				{
+					file << make_section(Fpair.first) << std::endl;
+					for (const auto& Spair : Fpair.second)
+					{
+						file << make_field(Spair.first, Spair.second) << std::endl;
+					}
+				}
+
+				file.close();
+			}
+			bool Write(data_t data)
+			{
+				std::lock_guard<std::mutex> lock(_data_mutex);
+
+				std::ofstream file(_path, std::ios::out);
+
+				if (!file.is_open())
+				{
+					return false;
+					throw std::exception("Cannot open the file.");
+				}
+
+				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
+
+				for (const auto& Fpair : data)
+				{
+					file << make_section(Fpair.first) << std::endl;
+					for (const auto& Spair : Fpair.second)
+					{
+						file << make_field(Spair.first, Spair.second) << std::endl;
+					}
+				}
+
+				file.close();
+			}
 			bool Write()
 			{
 				std::lock_guard<std::mutex> lock(_data_mutex);
 
+				std::ofstream file(_path, std::ios::out);
+			
+				if (!file.is_open())
+				{
+					return false;
+					throw std::exception("Cannot open the file.");
+				}
 
+				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
+				
+				for (const auto& Fpair : _data)
+				{
+					file << make_section(Fpair.first) << std::endl;
+					for (const auto& Spair : Fpair.second)
+					{
+						file << make_field(Spair.first, Spair.second) << std::endl;
+					}
+				}
+
+				file.close();
 			}
 
 			std::map<pre_proc, std::map<std::string, std::any>> GetPreproc() { return _preproc_list; }
@@ -93,6 +193,14 @@ namespace libCore {
 			std::map<std::string, std::map<std::string, std::any>> _data;
 			char _comment = ';';
 		private:
+			std::string make_field(std::string k, std::any d)
+			{
+				return k + "=" + std::any_cast<std::string>(d);
+			}
+			std::string make_section(std::string s)
+			{
+				return "[" + s + "]";
+			}
 			bool is_section(std::string sec)
 			{
 				auto size_sec = strlen(sec.c_str()) - 2;
