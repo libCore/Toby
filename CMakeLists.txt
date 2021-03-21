@@ -8,5 +8,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 project ("Toby")
 
-# Include sub-projects.
-add_subdirectory ("Toby")
+
+add_executable (Toby "main.cpp" "Toby.hh")
+

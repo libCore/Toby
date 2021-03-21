@@ -28,6 +28,7 @@
 #include <sstream>
 #include <map>
 #include <any>
+#include <mutex>
 #endif // !LIBCORE_NOINCLUDES
 
 namespace libCore {
@@ -60,7 +61,9 @@ namespace libCore {
 						if (!set_preproc(data))							
 							throw std::exception("Can't get the preprocs..");
 
-						if (std::any_cast<int>(_preproc_list[pre_proc::version]["ver"]) != LIBCORE_TOBY_VERSION)
+						std::any ver = _preproc_list[pre_proc::version]["ver"];
+
+						if (std::stoi(std::any_cast<std::string>(ver)) != LIBCORE_TOBY_VERSION)
 							throw std::exception("Version not implemented or supplied.");
 					}
 					else
@@ -69,39 +72,56 @@ namespace libCore {
 							throw std::exception("Can't parse.");
 					}
 				}
+				file.close();
 			}
 			int version() { return _ver; }
+			/*
 			std::map<std::string, std::map<std::string, std::any>> Read()
 			{
 				return _data;
 			}
+			*/
 			bool Write()
 			{
+				std::lock_guard<std::mutex> lock(_data_mutex);
+
 
 			}
+
+			std::map<pre_proc, std::map<std::string, std::any>> GetPreproc() { return _preproc_list; }
+
+			std::map<std::string, std::map<std::string, std::any>> _data;
+			char _comment = ';';
 		private:
 			bool is_section(std::string sec)
 			{
-				auto size_sec = sec.size();
-				return (sec[0] == '[' && sec[size_sec-1] == ']');
+				auto size_sec = strlen(sec.c_str()) - 2;
+				return (sec[0] == '[' && sec[size_sec] == ']');
 			}
 
 			std::string clean_section(std::string sec)
 			{
-				sec.erase(sec.begin());
-				sec.erase(sec.end() - 1);
-				return sec;
+				std::string _sec = sec;
+				_sec.erase(_sec.begin());
+				_sec.erase(_sec.end() - 2);
+				_sec.erase(_sec.end() - 1);
+				return _sec;
 			}
 
 			int parse(std::string line)
 			{
 				// main
 				// We check if the line is a section. If it is, we are going store the section.
+				if (line[0] == _comment || line == "") { return 1; }
 				if (is_section(line)) { _scope = clean_section(line); return 1; }
 
 				auto parsed_data = split(line, '=');
 				auto pair = std::make_pair(parsed_data[0], std::make_any<std::string>(parsed_data[1]));
+
+				const std::lock_guard<std::mutex> lock(_data_mutex);
+
 				_data[_scope].insert(pair);
+
 				return 0;
 			}
 
@@ -165,7 +185,7 @@ namespace libCore {
 			int _ver;
 			std::string _scope;
 			std::map<pre_proc, std::map<std::string, std::any>> _preproc_list;
-			std::map<std::string, std::map<std::string, std::any>> _data;
+			std::mutex _data_mutex;
 		};
 
 	}

@@ -10,20 +10,21 @@
 */
 
 // Your path to the toby header.
-#include <LibCore/Toby>
+#include "Toby.hh"
+#include <iostream>
 
-int simple(void)
+int main(void)
 {
 	// Toby parser should be always* in a try block.
-	try  
+	try
 	{
-		libCore::Toby::Toby config("Your path");
+		libCore::Toby::Toby config("examples\\example.toby");
 
 		// We get our info.
-		auto& config_map = config.Get();
+		auto& config_map = config._data;
 
 		// We need to use the any_cast, it always returns an any type variable.
-		std::string value = std::any_cast<std::string>(config_map["Main"]["a"]);
+		std::string value = std::any_cast<std::string>(config_map["main"]["a"]);
 
 		std::cout << value << std::endl;
 	}
@@ -31,5 +32,7 @@ int simple(void)
 	{
 		std::cout << e.what() << std::endl;
 	}
-	
+
+	return 0;
+
 }
