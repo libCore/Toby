@@ -1,6 +1,6 @@
 <p algin="center">
-	<h1>Toby v0.1</h1>
-	<h2>Config language and Parser Designed by and for Humans.</h2>
+	<p style="font-size:40px;">Toby v0.1</p>
+	<p style="font-size:32px;">Config language and Parser Designed by and for Humans.</p>
 	<img src="https://img.shields.io/badge/toby-v0.1-blue"/>
 </p>
 
@@ -8,7 +8,7 @@
 
 Toby focus on be the minimal and yet human alternative to any config parsers.
 
-Hash table (map) friendly.
+Toby is Hash table (map) friendly, making it very easy to integrate into your language and / or project.
 
 **There is no types**. As commented below, everything will be interpreted as a string.
 
