@@ -10,7 +10,7 @@
 ; It useful to divide and let the user know what is he configuring.
 ; Also, sections have scopes.
 
-a = 234
+a = 2 3 4
 
 ; The structure is simple. [identifier]=[value]
 ; nothing more, nothing less.

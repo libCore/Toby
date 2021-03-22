@@ -71,7 +71,7 @@ namespace libCore {
 					}
 					else
 					{
-						if (parse(remove_white(data)) == -1)
+						if (parse(data) == -1)
 							throw std::exception("Can't parse.");
 					}
 				}
@@ -220,15 +220,27 @@ namespace libCore {
 				s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 				return s;
 			}
-
+			std::string remove_first_whites(std::string s)
+			{
+				for (size_t i = 0; i < s.length(); i++)
+				{
+					if (isspace(s[0]))
+						s.erase(s.begin());
+					else
+						break;
+				}
+				return s;
+			}
 			int parse(std::string line)
 			{
 				// main
 				// We check if the line is a section. If it is, we are going store the section.
 				if (line[0] == _comment || line == "") { return 1; }
-				if (is_section(line)) { _scope = clean_section(line); return 1; }
+				if (is_section(remove_white(line))) { _scope = clean_section(remove_white(line)); return 1; }
 
 				auto parsed_data = split(line, '=');
+				parsed_data[0] = remove_white(parsed_data[0]);
+				parsed_data[1] = remove_first_whites(parsed_data[1]);
 				auto pair = std::make_pair(parsed_data[0], std::make_any<std::string>(parsed_data[1]));
 
 				const std::lock_guard<std::mutex> lock(_data_mutex);
