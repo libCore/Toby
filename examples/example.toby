@@ -1,21 +1,20 @@
-#version 0
+#version 1
 ; This is an example file of toby.
 ; Toby is similar to window's .ini files.
 ; The first line should be **always** the version.
-; like in c, we have "pre-processors". The preproc (pre-processors) is explained in the docs.
-[main] 
+
+[Main]
+
 ; This is a section.
-; It divides into pices the configs.
+; It divides the config into pices.
 ; It useful to divide and let the user know what is he configuring.
 ; Also, sections have scopes.
 
-a=123
-; The structure is simple. [token]=[value]
+a = 234
+
+; The structure is simple. [identifier]=[value]
 ; nothing more, nothing less.
 
 b=We don't need to use weird simbols like " that one.
 
-; One of the preproc is the `#define`, it does the exactly the same as the define in c.
-; It basically copy and paste where you call this define
-
-;#define best_config toby
+; You can change the comments token. However, by default and what we recomend is ;

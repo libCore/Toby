@@ -9,17 +9,18 @@
 		Limitations: Liability, Warranty
 */
 
-// Your path to the toby header.
+/*
+*	For examples check the `examples` folder. 
+* 
+* 
+*	Feel free to use this file to playing around :^)
+*/
+
+
 #include "Toby.hh"
 #include <iostream>
 #include <thread>
 
-void write_file(libCore::Toby::data_t d)
-{
-	libCore::Toby::Toby conf("out.toby");
-	
-	conf.Write(d);
-}
 
 int main(void)
 {
@@ -28,10 +29,7 @@ int main(void)
 	{
 		libCore::Toby::Toby config("C:\\Users\\Alex\\Source\\Repos\\Toby\\examples\\example.toby");
 	
-		std::thread t(write_file, config._data);
-
-		t.join();
-
+		std::cout << std::any_cast<std::string>(config._data["Main"]["a"]);
 	}
 	catch (const std::exception& e)
 	{

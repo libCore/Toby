@@ -17,15 +17,24 @@ int simple(void)
 	// Toby parser should be always* in a try block.
 	try  
 	{
+		// There is several ways to write into a file.
+		// In here we will cover the most common way.
+
 		libCore::Toby::Toby config("example.toby");
 
-		// We get our info.
-		auto& config_map = config._data;
+		config._data["Main"]["a"] = "We change the value";
 
-		// We need to use the any_cast, it always returns an any type variable.
-		std::string value = std::any_cast<std::string>(config_map["Main"]["a"]);
+		/*
+		* In toby there is 4 ways to write into a file.
+		* 
+		* 1- **Re-write** the file.
+		* 2- **Re-write** the file but, with **different** data.
+		* 3- Write into **another** file but, with the **same** data.
+		* 4- Write into **another** file but, with **different** data
+		*/
 
-		std::cout << value << std::endl;
+		config.Write(); // We are applying the 1 rule.
+		
 	}
 	catch (const std::exception& e)
 	{

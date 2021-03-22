@@ -16,7 +16,7 @@
 
 
 // YOU MUST **NOT** CHANGE THIS
-#define LIBCORE_TOBY_VERSION 0
+#define LIBCORE_TOBY_VERSION 1
 
 
 // If you don't want includes, just define it.
@@ -71,7 +71,7 @@ namespace libCore {
 					}
 					else
 					{
-						if (parse(data) == -1)
+						if (parse(remove_white(data)) == -1)
 							throw std::exception("Can't parse.");
 					}
 				}
@@ -203,7 +203,7 @@ namespace libCore {
 			}
 			bool is_section(std::string sec)
 			{
-				auto size_sec = strlen(sec.c_str()) - 2;
+				auto size_sec = strlen(sec.c_str()) - 1;
 				return (sec[0] == '[' && sec[size_sec] == ']');
 			}
 
@@ -211,9 +211,14 @@ namespace libCore {
 			{
 				std::string _sec = sec;
 				_sec.erase(_sec.begin());
-				_sec.erase(_sec.end() - 2);
 				_sec.erase(_sec.end() - 1);
 				return _sec;
+			}
+
+			std::string remove_white(std::string s)
+			{
+				s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
+				return s;
 			}
 
 			int parse(std::string line)

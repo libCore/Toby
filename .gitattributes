@@ -2,7 +2,7 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
-
+*.toby linguist-language=Toby
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
