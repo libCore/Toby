@@ -27,6 +27,10 @@ We can strip the code above into three simple elements:
 2. Identifier (key)
 3. Value (Data)
 
+# Usage
+
+Include the `Toby.hh` header file into your project.
+
 # Why?
 
 This config language was design to be extremely easy to modify and configure.
