@@ -189,20 +189,41 @@ namespace libCore {
 			std::map<std::string, std::map<std::string, std::any>> data;
 			char _comment = ';';
 		private:
+			/// <summary>
+			/// Makes a field.
+			/// </summary>
+			/// <param name="k">The key of the field.</param>
+			/// <param name="d">The data of the field.</param>
+			/// <returns>The field ready to insert into the file.</returns>
 			std::string make_field(std::string k, std::any d)
 			{
 				return k + "=" + std::any_cast<std::string>(d);
 			}
+			/// <summary>
+			/// Makes a section.
+			/// </summary>
+			/// <param name="s">Name of the section</param>
+			/// <returns>Section formatted.</returns>
 			std::string make_section(std::string s)
 			{
 				return "[" + s + "]";
 			}
+			/// <summary>
+			/// Checks if the string is a section
+			/// </summary>
+			/// <param name="sec">the line.</param>
+			/// <returns>True if it's a section.</returns>
 			bool is_section(std::string sec)
 			{
 				auto size_sec = sec.size() - 1;
 				return (sec[0] == '[' && sec[size_sec] == ']');
 			}
 
+			/// <summary>
+			/// Removes the brackets of a section.
+			/// </summary>
+			/// <param name="sec">The string.</param>
+			/// <returns>The name of the section.</returns>
 			std::string clean_section(std::string sec)
 			{
 				std::string _sec = sec;
@@ -210,12 +231,23 @@ namespace libCore {
 				_sec.erase(_sec.end() - 1);
 				return _sec;
 			}
-
+			
+			/// <summary>
+			/// Removes the white chars of a line.
+			/// </summary>
+			/// <param name="s">The string.</param>
+			/// <returns>The string without white chars.</returns>
 			std::string remove_white(std::string s)
 			{
 				s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
 				return s;
 			}
+
+			/// <summary>
+			/// Removes the first white chars of a string.
+			/// </summary>
+			/// <param name="s">The string.</param>
+			/// <returns>The line without the first white characters.</returns>
 			std::string remove_first_whites(std::string s)
 			{
 				for (size_t i = 0; i < s.length(); i++)
@@ -227,13 +259,20 @@ namespace libCore {
 				}
 				return s;
 			}
+
+			/// <summary>
+			/// Main function.
+			/// </summary>
+			/// <param name="line">The line.</param>
+			/// <returns>The status.</returns>
 			int parse(std::string line)
 			{
-				// main
-				// We check if the line is a section. If it is, we are going store the section.
+				// We check if the line is a comment. If it is, we go back into the loop.
 				if (line[0] == _comment || line == "") { return 1; }
+				// We check if the line is a section. If it is, we are going store the section.
 				if (is_section(remove_white(line))) { _scope = clean_section(remove_white(line)); return 1; }
 
+				// Parses the data. Self explanatory.
 				auto parsed_data = split(line, '=');
 				parsed_data[0] = remove_white(parsed_data[0]);
 				parsed_data[1] = remove_first_whites(parsed_data[1]);
@@ -246,6 +285,12 @@ namespace libCore {
 				return 0;
 			}
 
+			/// <summary>
+			/// /!\ Change the name of the function in future versions.
+			/// Allows to parse and sture the `preprocs`
+			/// </summary>
+			/// <param name="line">Line what we got from the main loop</param>
+			/// <returns>True if success</returns>
 			bool set_preproc(std::string line)
 			{
 				auto value_splitted = split(line, ' ');
@@ -290,6 +335,12 @@ namespace libCore {
 
 			public:
 			
+			/// <summary>
+			/// Util function. Allows split a string.
+			/// </summary>
+			/// <param name="s">String to split</param>
+			/// <param name="delimiter">Token to split</param>
+			/// <returns>Vector of strings</returns>
 			std::vector<std::string> split(const std::string& s, char delimiter)
 			{
 				std::vector<std::string> tokens;
