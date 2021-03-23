@@ -78,13 +78,7 @@ namespace libCore {
 				file.close();
 			}
 			int version() { return _ver; }
-			/*
-			std::map<std::string, std::map<std::string, std::any>> Read()
-			{
-				return _data;
-			}
-			*/
-			// DumbWrite
+
 			bool Write(std::string path, data_t data)
 			{
 
@@ -126,7 +120,7 @@ namespace libCore {
 
 				std::lock_guard<std::mutex> lock(_data_mutex);
 
-				for (const auto& Fpair : _data)
+				for (const auto& Fpair : data)
 				{
 					file << make_section(Fpair.first) << std::endl;
 					for (const auto& Spair : Fpair.second)
@@ -176,7 +170,7 @@ namespace libCore {
 
 				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
 				
-				for (const auto& Fpair : _data)
+				for (const auto& Fpair : data)
 				{
 					file << make_section(Fpair.first) << std::endl;
 					for (const auto& Spair : Fpair.second)
@@ -190,7 +184,9 @@ namespace libCore {
 
 			std::map<pre_proc, std::map<std::string, std::any>> GetPreproc() { return _preproc_list; }
 
-			std::map<std::string, std::map<std::string, std::any>> _data;
+
+		public:
+			std::map<std::string, std::map<std::string, std::any>> data;
 			char _comment = ';';
 		private:
 			std::string make_field(std::string k, std::any d)
@@ -203,7 +199,7 @@ namespace libCore {
 			}
 			bool is_section(std::string sec)
 			{
-				auto size_sec = strlen(sec.c_str()) - 1;
+				auto size_sec = sec.size() - 1;
 				return (sec[0] == '[' && sec[size_sec] == ']');
 			}
 
@@ -245,7 +241,7 @@ namespace libCore {
 
 				const std::lock_guard<std::mutex> lock(_data_mutex);
 
-				_data[_scope].insert(pair);
+				data[_scope].insert(pair);
 
 				return 0;
 			}
@@ -291,6 +287,9 @@ namespace libCore {
 				}
 			}
 
+
+			public:
+			
 			std::vector<std::string> split(const std::string& s, char delimiter)
 			{
 				std::vector<std::string> tokens;

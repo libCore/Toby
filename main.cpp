@@ -27,9 +27,9 @@ int main(void)
 	// Toby parser should be always* in a try block.
 	try
 	{
-		libCore::Toby::Toby config("C:\\Users\\Alex\\Source\\Repos\\Toby\\examples\\example.toby");
+		libCore::Toby::Toby config("PATH");
 	
-		std::cout << std::any_cast<std::string>(config._data["Main"]["a"]);
+		std::cout << std::any_cast<std::string>(config.data["Main"]["a"]);
 	}
 	catch (const std::exception& e)
 	{
