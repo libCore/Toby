@@ -3,10 +3,7 @@
 
 	Author: Alex. G. B. aka Zankuro
 
-	License: BSD 2-Clause License
-		Permisions: Commercial use, Distribution, Modification, Private use
-		Conditions: License and copyright notice
-		Limitations: Liability, Warranty
+	License: GNU GPLv2
 */
 
 // Your path to the toby header.

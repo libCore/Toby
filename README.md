@@ -46,3 +46,7 @@ Talking about types. We allow the programmer (you) to interpret the data of ever
 You can interpret this as a string. Or if you strip and parse: an array of three integers.
 
 As you can see, the syntax of Toby is minimalists. This is because you don't need anything more.
+
+# License
+
+Toby project is using GNU General Public License v2.0

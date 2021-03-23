@@ -5,10 +5,7 @@
 
 	Author: Alex. G. B. aka Zankuro
 
-	License: BSD 2-Clause License
-		Permisions: Commercial use, Distribution, Modification, Private use
-		Conditions: License and copyright notice
-		Limitations: Liability, Warranty
+	License: GNU GPLv2
 */
 
 #ifndef LIBCORE_TOBY
@@ -285,7 +282,7 @@ namespace libCore {
 				return 0;
 			}
 
-			/// <summary>
+			/// <summary>	
 			/// /!\ Change the name of the function in future versions.
 			/// Allows to parse and sture the `preprocs`
 			/// </summary>

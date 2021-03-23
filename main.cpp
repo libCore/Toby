@@ -3,10 +3,7 @@
 
 	Author: Alex. G. B. aka Zankuro
 
-	License: BSD 2-Clause License
-		Permisions: Commercial use, Distribution, Modification, Private use
-		Conditions: License and copyright notice
-		Limitations: Liability, Warranty
+	License: GNU GPLv2
 */
 
 /*
@@ -19,7 +16,6 @@
 
 #include "Toby.hh"
 #include <iostream>
-#include <thread>
 
 
 int main(void)
@@ -27,9 +23,18 @@ int main(void)
 	// Toby parser should be always* in a try block.
 	try
 	{
-		libCore::Toby::Toby config("PATH");
-	
-		std::cout << std::any_cast<std::string>(config.data["Main"]["a"]);
+		/*
+		* Welcome to the playground!
+		* 
+		* On here is the minimal setup for use Toby.
+		* I recomend get used to the api before adding Toby to your application.
+		* Don't worry, it doesn't take so much time to learn.
+		* 
+		* Have fun! :^)
+		*/
+
+		libCore::Toby::Toby config("Path");
+
 	}
 	catch (const std::exception& e)
 	{
