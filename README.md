@@ -26,7 +26,7 @@ max_connections = 100
 ; You can use `true` or `false`. But is more easy if using 1.
 enabled = 1
 
-; /!\ WIP Zone /!\ This is se additions upcoming for the version 2.
+; /!\ WIP Zone /!\ This is the additions upcoming for the version 2.
 [servers]
 
 ; We can use dots.
