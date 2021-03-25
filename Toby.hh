@@ -33,46 +33,48 @@ namespace libCore {
 
 	namespace Toby {
 
-		enum class pre_proc
+		enum class EPreProc
 		{
-			version,
-			define
+			VERSION,
+			DEFINE
 		};
 		
 		typedef std::map<std::string, std::map<std::string, std::any>> data_t;
+		typedef std::map<std::string, std::any> pair_t;
 
 		class Toby
 		{
+
 		public:
 			Toby(std::string path)
 			{
 				_path = path;
 
-				std::string data;
-				std::ifstream file(_path, std::ios_base::in);
+				std::string sData;
+				std::ifstream ifsFile(_path, std::ios_base::in);
 
-				if (!file.is_open())
+				if (!ifsFile.is_open())
 					throw std::exception("Cannot open the file.");
 
-				while (std::getline(file, data))
+				while (std::getline(ifsFile, sData))
 				{
-					if (data[0] == '#')
+					if (sData[0] == '#')
 					{
-						if (!set_preproc(data))							
+						if (!set_preproc(sData))							
 							throw std::exception("Can't get the preprocs..");
 
-						std::any ver = _preproc_list[pre_proc::version]["ver"];
+						std::any ver = _preproc_list[EPreProc::VERSION]["ver"];
 
 						if (std::stoi(std::any_cast<std::string>(ver)) != LIBCORE_TOBY_VERSION)
 							throw std::exception("Version not implemented or supplied.");
 					}
 					else
 					{
-						if (parse(data) == -1)
+						if (parse(sData) == -1)
 							throw std::exception("Can't parse.");
 					}
 				}
-				file.close();
+				ifsFile.close();
 			}
 			int version() { return _ver; }
 
@@ -179,12 +181,12 @@ namespace libCore {
 				file.close();
 			}
 
-			std::map<pre_proc, std::map<std::string, std::any>> GetPreproc() { return _preproc_list; }
+			std::map<EPreProc, std::map<std::string, std::any>> GetPreproc() { return _preproc_list; }
 
 
 		public:
-			std::map<std::string, std::map<std::string, std::any>> data;
-			char _comment = ';';
+			data_t data;
+			char czComment = ';';
 		private:
 			/// <summary>
 			/// Makes a field.
@@ -265,7 +267,7 @@ namespace libCore {
 			int parse(std::string line)
 			{
 				// We check if the line is a comment. If it is, we go back into the loop.
-				if (line[0] == _comment || line == "") { return 1; }
+				if (line[0] == czComment || line == "") { return 1; }
 				// We check if the line is a section. If it is, we are going store the section.
 				if (is_section(remove_white(line))) { _scope = clean_section(remove_white(line)); return 1; }
 
@@ -298,7 +300,7 @@ namespace libCore {
 					try
 					{
 						_ver = std::stoi(value_splitted[1]);
-						_preproc_list[pre_proc::version].insert(std::make_pair<std::string, std::any>("ver", std::make_any<std::string>(value_splitted[1])));
+						_preproc_list[EPreProc::VERSION].insert(std::make_pair<std::string, std::any>("ver", std::make_any<std::string>(value_splitted[1])));
 
 						return true;
 					}
@@ -313,7 +315,7 @@ namespace libCore {
 				{
 					try
 					{
-						_preproc_list[pre_proc::define].insert(std::make_pair<std::string, std::any>(value_splitted[1].c_str(), std::make_any<std::string>(value_splitted[2])));
+						_preproc_list[EPreProc::DEFINE].insert(std::make_pair<std::string, std::any>(value_splitted[1].c_str(), std::make_any<std::string>(value_splitted[2])));
 						return true;
 
 					}
@@ -356,7 +358,7 @@ namespace libCore {
 			std::string _path;
 			int _ver;
 			std::string _scope;
-			std::map<pre_proc, std::map<std::string, std::any>> _preproc_list;
+			std::map<EPreProc, std::map<std::string, std::any>> _preproc_list;
 			std::mutex _data_mutex;
 		};
 
