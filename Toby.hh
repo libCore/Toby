@@ -38,6 +38,18 @@ namespace libCore {
 			VERSION,
 			DEFINE
 		};
+
+		enum class EComment
+		{
+			SEMICOLON,
+			HASH
+		};
+
+		enum class EChildSeparator
+		{
+			DOT,
+			SLASH
+		};
 		
 		typedef std::map<std::string, std::map<std::string, std::any>> data_t;
 		typedef std::map<std::string, std::any> pair_t;
@@ -46,38 +58,17 @@ namespace libCore {
 		{
 
 		public:
+			Toby() {}
 			Toby(std::string path)
 			{
-				_path = path;
+				sPath = path;
 
-				std::string sData;
-				std::ifstream ifsFile(_path, std::ios_base::in);
-
-				if (!ifsFile.is_open())
-					throw std::exception("Cannot open the file.");
-
-				while (std::getline(ifsFile, sData))
-				{
-					if (sData[0] == '#')
-					{
-						if (!set_preproc(sData))							
-							throw std::exception("Can't get the preprocs..");
-
-						std::any ver = _preproc_list[EPreProc::VERSION]["ver"];
-
-						if (std::stoi(std::any_cast<std::string>(ver)) != LIBCORE_TOBY_VERSION)
-							throw std::exception("Version not implemented or supplied.");
-					}
-					else
-					{
-						if (parse(sData) == -1)
-							throw std::exception("Can't parse.");
-					}
-				}
-				ifsFile.close();
+				Read();
 			}
+
 			int version() { return _ver; }
 
+			// Writes the file from the path especified with custom data.
 			bool Write(std::string path, data_t data)
 			{
 
@@ -104,6 +95,7 @@ namespace libCore {
 
 				file.close();
 			}
+			// Write the file from the path especified, with the local data
 			bool Write(std::string path)
 			{
 
@@ -130,11 +122,12 @@ namespace libCore {
 
 				file.close();
 			}
+			// Write the file from the constructor with custom data.
 			bool Write(data_t data)
 			{
 				std::lock_guard<std::mutex> lock(_data_mutex);
 
-				std::ofstream file(_path, std::ios::out);
+				std::ofstream file(sPath, std::ios::out);
 
 				if (!file.is_open())
 				{
@@ -155,11 +148,12 @@ namespace libCore {
 
 				file.close();
 			}
+			// Write the file from the constructor
 			bool Write()
 			{
 				std::lock_guard<std::mutex> lock(_data_mutex);
 
-				std::ofstream file(_path, std::ios::out);
+				std::ofstream file(sPath, std::ios::out);
 			
 				if (!file.is_open())
 				{
@@ -186,8 +180,40 @@ namespace libCore {
 
 		public:
 			data_t data;
+			std::string sPath;
 			char czComment = ';';
 		private:
+
+			bool Read()
+			{
+				std::string sData;
+				std::ifstream ifsFile(sPath, std::ios_base::in);
+
+				if (!ifsFile.is_open())
+					throw std::exception("Cannot open the file.");
+
+				while (std::getline(ifsFile, sData))
+				{
+					if (sData[0] == '#')
+					{
+						if (!set_preproc(sData))
+							throw std::exception("Can't get the preprocs..");
+
+						std::any ver = _preproc_list[EPreProc::VERSION]["ver"];
+
+						if (std::stoi(std::any_cast<std::string>(ver)) != LIBCORE_TOBY_VERSION)
+							throw std::exception("Version not implemented or supplied.");
+					}
+					else
+					{
+						if (parse(sData) == -1)
+							throw std::exception("Can't parse.");
+					}
+				}
+				ifsFile.close();
+				return true;
+			}
+
 			/// <summary>
 			/// Makes a field.
 			/// </summary>
@@ -205,6 +231,7 @@ namespace libCore {
 			/// <returns>Section formatted.</returns>
 			std::string make_section(std::string s)
 			{
+				
 				return "[" + s + "]";
 			}
 			/// <summary>
@@ -355,7 +382,6 @@ namespace libCore {
 	
 
 		private:
-			std::string _path;
 			int _ver;
 			std::string _scope;
 			std::map<EPreProc, std::map<std::string, std::any>> _preproc_list;
