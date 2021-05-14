@@ -29,6 +29,7 @@
 #include <mutex>
 #endif // !LIBCORE_NOINCLUDES
 
+
 namespace libCore {
 
 	namespace Toby {
@@ -50,7 +51,7 @@ namespace libCore {
 			DOT,
 			SLASH
 		};
-		
+
 		typedef std::map<std::string, std::map<std::string, std::any>> data_t;
 		typedef std::map<std::string, std::any> pair_t;
 
@@ -58,15 +59,16 @@ namespace libCore {
 		{
 
 		public:
-			Toby() {}
-			Toby(std::string path)
+			Toby() = default;
+
+			void run(std::string path)
 			{
 				sPath = path;
 
 				Read();
 			}
 
-			int version() { return _ver; }
+			int version() { return m_ver; }
 
 			// Writes the file from the path especified with custom data.
 			bool Write(std::string path, data_t data)
@@ -77,12 +79,13 @@ namespace libCore {
 				if (!file.is_open())
 				{
 					return false;
-					throw std::exception("Cannot open the file.");
+
+					throw std::runtime_error("Cannot open the file.");
 				}
 
 				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
 
-				std::lock_guard<std::mutex> lock(_data_mutex);
+				std::lock_guard<std::mutex> lock(m_data_mutex);
 
 				for (const auto& Fpair : data)
 				{
@@ -104,12 +107,12 @@ namespace libCore {
 				if (!file.is_open())
 				{
 					return false;
-					throw std::exception("Cannot open the file.");
+					throw std::runtime_error("Cannot open the file.");
 				}
 
 				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
 
-				std::lock_guard<std::mutex> lock(_data_mutex);
+				std::lock_guard<std::mutex> lock(m_data_mutex);
 
 				for (const auto& Fpair : data)
 				{
@@ -125,14 +128,14 @@ namespace libCore {
 			// Write the file from the constructor with custom data.
 			bool Write(data_t data)
 			{
-				std::lock_guard<std::mutex> lock(_data_mutex);
+				std::lock_guard<std::mutex> lock(m_data_mutex);
 
 				std::ofstream file(sPath, std::ios::out);
 
 				if (!file.is_open())
 				{
 					return false;
-					throw std::exception("Cannot open the file.");
+					throw std::runtime_error("Cannot open the file.");
 				}
 
 				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
@@ -151,18 +154,18 @@ namespace libCore {
 			// Write the file from the constructor
 			bool Write()
 			{
-				std::lock_guard<std::mutex> lock(_data_mutex);
+				std::lock_guard<std::mutex> lock(m_data_mutex);
 
 				std::ofstream file(sPath, std::ios::out);
-			
+
 				if (!file.is_open())
 				{
 					return false;
-					throw std::exception("Cannot open the file.");
+					throw std::runtime_error("Cannot open the file.");
 				}
 
 				file << "#version " << LIBCORE_TOBY_VERSION << std::endl;
-				
+
 				for (const auto& Fpair : data)
 				{
 					file << make_section(Fpair.first) << std::endl;
@@ -175,7 +178,7 @@ namespace libCore {
 				file.close();
 			}
 
-			std::map<EPreProc, std::map<std::string, std::any>> GetPreproc() { return _preproc_list; }
+			std::map<EPreProc, std::map<std::string, std::any>> GetPreproc() { return m_preproc_list; }
 
 
 		public:
@@ -190,24 +193,24 @@ namespace libCore {
 				std::ifstream ifsFile(sPath, std::ios_base::in);
 
 				if (!ifsFile.is_open())
-					throw std::exception("Cannot open the file.");
+					throw std::runtime_error("Cannot open the file.");
 
 				while (std::getline(ifsFile, sData))
 				{
 					if (sData[0] == '#')
 					{
 						if (!set_preproc(sData))
-							throw std::exception("Can't get the preprocs..");
+							throw std::runtime_error("Can't get the preprocs..");
 
-						std::any ver = _preproc_list[EPreProc::VERSION]["ver"];
+						std::any ver = m_preproc_list[EPreProc::VERSION]["ver"];
 
 						if (std::stoi(std::any_cast<std::string>(ver)) != LIBCORE_TOBY_VERSION)
-							throw std::exception("Version not implemented or supplied.");
+							throw std::runtime_error("Version not implemented or supplied.");
 					}
 					else
 					{
 						if (parse(sData) == -1)
-							throw std::exception("Can't parse.");
+							throw std::runtime_error("Can't parse.");
 					}
 				}
 				ifsFile.close();
@@ -231,7 +234,7 @@ namespace libCore {
 			/// <returns>Section formatted.</returns>
 			std::string make_section(std::string s)
 			{
-				
+
 				return "[" + s + "]";
 			}
 			/// <summary>
@@ -257,7 +260,7 @@ namespace libCore {
 				_sec.erase(_sec.end() - 1);
 				return _sec;
 			}
-			
+
 			/// <summary>
 			/// Removes the white chars of a line.
 			/// </summary>
@@ -296,23 +299,32 @@ namespace libCore {
 				// We check if the line is a comment. If it is, we go back into the loop.
 				if (line[0] == czComment || line == "") { return 1; }
 				// We check if the line is a section. If it is, we are going store the section.
-				if (is_section(remove_white(line))) { _scope = clean_section(remove_white(line)); return 1; }
+				if (is_section(remove_white(line))) { m_scope = clean_section(remove_white(line)); return 1; }
 
 				// Parses the data. Self explanatory.
 				auto parsed_data = split(line, '=');
+
+				// If one of the values has a = for example:
+				// flags = --std=c++20
+				if (parsed_data.size() > 2)
+				{
+					parsed_data[1].append("=" + parsed_data[2]);
+					parsed_data.erase(parsed_data.begin() + 2); // We remove the i=2;
+				}
+
 				parsed_data[0] = remove_white(parsed_data[0]);
 				parsed_data[1] = remove_first_whites(parsed_data[1]);
 				auto pair = std::make_pair(parsed_data[0], std::make_any<std::string>(parsed_data[1]));
 
-				const std::lock_guard<std::mutex> lock(_data_mutex);
+				const std::lock_guard<std::mutex> lock(m_data_mutex);
 
-				data[_scope].insert(pair);
+				data[m_scope].insert(pair);
 
 				return 0;
 			}
 
 			/// <summary>	
-			/// /!\ Change the name of the function in future versions.
+			/// /!\\ Change the name of the function in future versions.
 			/// Allows to parse and sture the `preprocs`
 			/// </summary>
 			/// <param name="line">Line what we got from the main loop</param>
@@ -326,12 +338,12 @@ namespace libCore {
 				{
 					try
 					{
-						_ver = std::stoi(value_splitted[1]);
-						_preproc_list[EPreProc::VERSION].insert(std::make_pair<std::string, std::any>("ver", std::make_any<std::string>(value_splitted[1])));
+						m_ver = std::stoi(value_splitted[1]);
+						m_preproc_list[EPreProc::VERSION].insert(std::make_pair<std::string, std::any>("ver", std::make_any<std::string>(value_splitted[1])));
 
 						return true;
 					}
-					catch (const std::exception& e)
+					catch (const std::runtime_error& e)
 					{
 						throw e;
 						return false;
@@ -342,11 +354,10 @@ namespace libCore {
 				{
 					try
 					{
-						_preproc_list[EPreProc::DEFINE].insert(std::make_pair<std::string, std::any>(value_splitted[1].c_str(), std::make_any<std::string>(value_splitted[2])));
+						m_preproc_list[EPreProc::DEFINE].insert(std::make_pair<std::string, std::any>(value_splitted[1].c_str(), std::make_any<std::string>(value_splitted[2])));
 						return true;
-
 					}
-					catch (const std::exception& e)
+					catch (const std::runtime_error& e)
 					{
 						throw e;
 						return false;
@@ -354,13 +365,13 @@ namespace libCore {
 				}
 				else
 				{
-					throw std::exception("Unknow preproc");
+					throw std::runtime_error("Unknow preproc");
 				}
 			}
 
 
-			public:
-			
+		public:
+
 			/// <summary>
 			/// Util function. Allows split a string.
 			/// </summary>
@@ -379,13 +390,13 @@ namespace libCore {
 				return tokens;
 			}
 
-	
+
 
 		private:
-			int _ver;
-			std::string _scope;
-			std::map<EPreProc, std::map<std::string, std::any>> _preproc_list;
-			std::mutex _data_mutex;
+			int m_ver;
+			std::string m_scope;
+			std::map<EPreProc, std::map<std::string, std::any>> m_preproc_list;
+			std::mutex m_data_mutex;
 		};
 
 	}

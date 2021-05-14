@@ -17,4 +17,6 @@ a = 1;1;1
 
 b=We don't need to use weird simbols like " that one.
 
+c = Test=23
+
 ; You can change the comments token. However, by default and what we recomend is ;
